@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- From: file:/Users/Nick_Guan/Desktop/CS%20M117/EffectiveNavigation/app/src/main/res/values/strings.xml -->
+    <!-- From: file:/Users/Nick_Guan/Desktop/CS%20M117/EffectiveNavigation1/app/src/main/res/values/strings.xml -->
     <eat-comment/>
-    <string name="app_name">Effective Navigation</string>
+    <string name="app_name">ListenTGT</string>
     <string name="demo_collection">Demo Collection</string>
     <string name="demo_external_activity">Demo External Activity</string>
     <string name="dummy_section_text">Section %1d is just a dummy section.</string>

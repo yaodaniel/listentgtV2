@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+	<TextView
+    	android:id="@+id/PD"
+    	android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:layout_alignParentTop="true"
+    	android:textSize="25sp"
+    	android:text="Songs" />
+	
+    <ListView
+        android:id="@+id/song_list"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/PD" >
+        <!--android:layout_above="@+id/Connect" > -->
+    </ListView>
+	<!--
+		<Button
+		android:id="@+id/Connect"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_alignParentBottom="true"
+		android:text="Connect via Bluetooth" />
+	-->
+</RelativeLayout>
+<!-- From: file:/Users/Nick_Guan/Desktop/CS%20M117/EffectiveNavigation1/app/src/main/res/layout/fragment_playlist_page.xml -->

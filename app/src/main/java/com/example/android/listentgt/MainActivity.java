@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.effectivenavigation;
+package com.example.android.listentgt;
 
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
@@ -25,6 +25,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,6 +46,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
      * time.
      */
     ViewPager mViewPager;
+    String[] pages = new String[]{"Playlist", "Connect", "Settings"};
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,7 +87,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
             // listener for when this tab is selected.
             actionBar.addTab(
                     actionBar.newTab()
-                            .setText(mAppSectionsPagerAdapter.getPageTitle(i))
+                            .setText(pages[i])
                             .setTabListener(this));
         }
     }
@@ -98,6 +100,12 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
         // When the given tab is selected, switch to the corresponding page in the ViewPager.
         mViewPager.setCurrentItem(tab.getPosition());
+        Log.i("tab", "In On selected");
+
+        if (tab.getText().equals("Playlist"))
+        {
+            Log.i("tab", "playlist tab selected");
+        }
     }
 
     @Override
@@ -120,7 +128,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                 case 0:
                     // The first section of the app is the most interesting -- it offers
                     // a launchpad into the other demonstrations in this example application.
-                    return new LaunchpadSectionFragment();
+                    return new FragmentMusicPlayerActivity();
 
                 default:
                     // The other sections of the app are dummy placeholders.

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.effectivenavigation;
+package com.example.android.listentgt;
 
 import android.app.ActionBar;
 import android.content.Intent;
