@@ -2,25 +2,25 @@
 <items version="2" >
 
     <item
-        jar="/Users/Nick_Guan/Desktop/CS M117/EffectiveNavigation1/app/build/intermediates/exploded-aar/com.android.support/support-v4/22.1.1/libs/internal_impl-22.1.1.jar"
+        jar="C:\Users\DanielY\Documents\SBHack\HackSB\sdk\extras\android\m2repository\com\android\support\support-annotations\22.1.1\support-annotations-22.1.1.jar"
         jumboMode="false"
-        revision="21.1.2"
-        sha1="9e070ad32b2700b0343e8e0cccc437733d91ba3a">
-        <dex dex="/Users/Nick_Guan/Desktop/CS M117/EffectiveNavigation1/app/build/intermediates/pre-dexed/debug/internal_impl-22.1.1-f117ff2e2d89d6a890d9e71db98605e553302c20.jar" />
-    </item>
-    <item
-        jar="/Users/Nick_Guan/Documents/adt-bundle-mac-x86_64-20140702/sdk/extras/android/m2repository/com/android/support/support-annotations/22.1.1/support-annotations-22.1.1.jar"
-        jumboMode="false"
-        revision="21.1.2"
+        revision="19.1.0"
         sha1="01d051a6bfb1218b1db2d3a5af0480ac2c25c42a">
-        <dex dex="/Users/Nick_Guan/Desktop/CS M117/EffectiveNavigation1/app/build/intermediates/pre-dexed/debug/support-annotations-22.1.1-c524707da0938daf14b56da7c8a7383da474962f.jar" />
+        <dex dex="C:\Users\DanielY\Documents\CSM117\listentgtV2\listentgtV2\app\build\intermediates\pre-dexed\debug\support-annotations-22.1.1-3bd51f7384c281ca3a6deb29cae4a6423dc824f2.jar" />
     </item>
     <item
-        jar="/Users/Nick_Guan/Desktop/CS M117/EffectiveNavigation1/app/build/intermediates/exploded-aar/com.android.support/support-v4/22.1.1/classes.jar"
+        jar="C:\Users\DanielY\Documents\CSM117\listentgtV2\listentgtV2\app\build\intermediates\exploded-aar\com.android.support\support-v4\22.1.1\classes.jar"
         jumboMode="false"
-        revision="21.1.2"
+        revision="19.1.0"
         sha1="c95ba8152923e4872e86a82cfcba9a51c0214328">
-        <dex dex="/Users/Nick_Guan/Desktop/CS M117/EffectiveNavigation1/app/build/intermediates/pre-dexed/debug/classes-fa6a37026efcb8006b92359a5227546189e04d29.jar" />
+        <dex dex="C:\Users\DanielY\Documents\CSM117\listentgtV2\listentgtV2\app\build\intermediates\pre-dexed\debug\classes-ac70848d32030aad95cce7cf98c3536b231fca3c.jar" />
+    </item>
+    <item
+        jar="C:\Users\DanielY\Documents\CSM117\listentgtV2\listentgtV2\app\build\intermediates\exploded-aar\com.android.support\support-v4\22.1.1\libs\internal_impl-22.1.1.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="9e070ad32b2700b0343e8e0cccc437733d91ba3a">
+        <dex dex="C:\Users\DanielY\Documents\CSM117\listentgtV2\listentgtV2\app\build\intermediates\pre-dexed\debug\internal_impl-22.1.1-99b6d21ea7bf132bfdd189607f317d365c5ce4f6.jar" />
     </item>
 
 </items>
