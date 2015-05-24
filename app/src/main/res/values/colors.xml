@@ -15,18 +15,8 @@
   limitations under the License.
 -->
 
-<!--
-  This drawable is used as the main touch feedback drawable for the Action Bar. By default it is
-  used as the action item button background, amongst other things.
+<resources>
 
-  The different items in this drawable are displayed when their selector state matches the view's
-  state.
--->
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <color name="pressed_styled">#CC669900</color>
 
-    <item android:drawable="@drawable/list_focused_styled" android:state_focused="true"
-          android:state_pressed="false"/>
-    <item android:drawable="@drawable/pressed_background" android:state_pressed="true"/>
-    <item android:drawable="@android:color/transparent"/>
-
-</selector>
+</resources>

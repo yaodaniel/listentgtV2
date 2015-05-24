@@ -46,7 +46,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
      * time.
      */
     ViewPager mViewPager;
-    String[] pages = new String[]{"Playlist", "Connect", "Settings"};
+    String[] pages = new String[]{"Playlist", "MusicPlayer", "Connect", "Settings"};
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -129,7 +129,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                     // The first section of the app is the most interesting -- it offers
                     // a launchpad into the other demonstrations in this example application.
                     return new FragmentMusicPlayerActivity();
-
+                case 1:
+                    return new musicPlayerActivity();
                 default:
                     // The other sections of the app are dummy placeholders.
                     Fragment fragment = new DummySectionFragment();
@@ -142,7 +143,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
         @Override
         public int getCount() {
-            return 3;
+            return 4;
         }
 
         @Override
