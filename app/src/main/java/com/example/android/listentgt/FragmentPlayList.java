@@ -1,47 +1,53 @@
 package com.example.android.listentgt;
 
-import android.app.Activity;
+import com.example.android.listentgt.MusicService.MusicBinder;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ListView;
-import android.widget.LinearLayout;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.content.Intent;
-import android.net.Uri;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.Fragment;
 import android.widget.RelativeLayout;
-
+import android.os.IBinder;
+import android.content.ComponentName;
+import android.content.ServiceConnection;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-public class FragmentMusicPlayerActivity extends Fragment {
+public class FragmentPlayList extends Fragment implements View.OnClickListener{
+
 	private ArrayList<song> songList;
 	private ListView songView;
-	
-//	@Override
-//	protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.playlist_page);
-//        songView = (ListView)findViewById(R.id.song_list);
-//        songList = new ArrayList<song>();
-//        getSongList();
-//        Collections.sort(songList, new Comparator<song>() {
-//            public int compare(song a, song b) {
-//                return a.getTitle().compareTo(b.getTitle());
-//            }
-//        });
-//        SongAdapter songAdt = new SongAdapter(this, songList);
-//        songView.setAdapter(songAdt);
-//    }
+	private MusicService musicSrv;
+	private Intent playIntent;
+	private boolean musicBound=false;
+	//connect to the service
+	private ServiceConnection musicConnection = new ServiceConnection(){
+
+		@Override
+		public void onServiceConnected(ComponentName name, IBinder service) {
+			MusicBinder binder = (MusicBinder)service;
+			//get service
+			musicSrv = binder.getService();
+			//pass list
+			musicSrv.setList(songList);
+			musicBound = true;
+		}
+
+		@Override
+		public void onServiceDisconnected(ComponentName name) {
+			musicBound = false;
+		}
+	};
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -49,21 +55,42 @@ public class FragmentMusicPlayerActivity extends Fragment {
         // Replace LinearLayout by the type of the root element of the layout you're trying to load
         RelativeLayout RLayout  = (RelativeLayout)  inflater.inflate(R.layout.playlist_page, container, false);
 
-
         // The FragmentActivity doesn't contain the layout directly so we must use our instance of     LinearLayout :
         songView = (ListView) RLayout.findViewById(R.id.song_list);
         songList = new ArrayList<song>();
         getSongList();
         Collections.sort(songList, new Comparator<song>() {
-            public int compare(song a, song b) {
-                return a.getTitle().compareTo(b.getTitle());
-            }
-        });
-        SongAdapter songAdt = new SongAdapter(faActivity, songList);
+			public int compare(song a, song b) {
+				return a.getTitle().compareTo(b.getTitle());
+			}
+		});
+        SongAdapter songAdt = new SongAdapter(this, faActivity, songList);
         songView.setAdapter(songAdt);
 
         return RLayout; // We must return the loaded Layout
     }
+
+	@Override
+	public void onStart() {
+		super.onStart();
+		if(playIntent==null){
+			playIntent = new Intent(this.getActivity(), MusicService.class);
+			this.getActivity().bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
+			this.getActivity().startService(playIntent);
+		}
+	}
+
+	@Override
+	public void onDestroy(){
+		this.getActivity().stopService(playIntent);
+		musicSrv=null;
+		super.onDestroy();
+	}
+
+	public void songPicked(View view) {
+		musicSrv.setSong(Integer.parseInt(view.getTag().toString()));
+		musicSrv.playSong();
+	}
 
 	public void getSongList() {
         FragmentActivity faActivity  = (FragmentActivity) super.getActivity();
@@ -87,6 +114,22 @@ public class FragmentMusicPlayerActivity extends Fragment {
 			    songList.add(new song(thisId, thisTitle, thisArtist));
 			  }
 			  while (musicCursor.moveToNext());
+		}
+	}
+
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+			case R.id.ASong:
+				songPicked(v);
+				//getActivity().setContentView(R.layout.player_page);
+				getFragmentManager().beginTransaction().replace(R.id.playlistPage,new FragmentMusicPlayer()).commit();
+
+				//getFragmentManager().beginTransaction().remove(this).commit();
+				break;
+			default:
+				Log.i("default:", "default");
+				break;
 		}
 	}
 }

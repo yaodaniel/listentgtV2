@@ -1,6 +1,7 @@
 package com.example.android.listentgt;
 
 import android.content.Context;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,10 +15,12 @@ public class SongAdapter extends BaseAdapter {
 
 	private ArrayList<song> songs;
 	private LayoutInflater songInf;
+	private Fragment parentFrag;
 	
-	public SongAdapter(Context c, ArrayList<song> theSongs) {
+	public SongAdapter(Fragment obj, Context c, ArrayList<song> theSongs) {
 		songs = theSongs;
 		songInf = LayoutInflater.from(c);
+		parentFrag = obj;
 	}
 	@Override
 	public int getCount() {
@@ -41,6 +44,7 @@ public class SongAdapter extends BaseAdapter {
 	public View getView(int position, View convertView, ViewGroup parent) {
 		//map to song layout
 		  LinearLayout songLay = (LinearLayout)songInf.inflate(R.layout.song, parent, false);
+		  songLay.setOnClickListener((FragmentPlayList)parentFrag);
 		  //get title and artist views
 		  TextView songView = (TextView)songLay.findViewById(R.id.song_title);
 		  TextView artistView = (TextView)songLay.findViewById(R.id.song_artist);
