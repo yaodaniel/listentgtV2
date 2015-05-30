@@ -25,29 +25,29 @@ import java.util.Comparator;
 
 public class FragmentPlayList extends Fragment implements View.OnClickListener{
 
-	private ArrayList<song> songList;
-	private ListView songView;
-	private MusicService musicSrv;
-	private Intent playIntent;
-	private boolean musicBound=false;
-	//connect to the service
-	private ServiceConnection musicConnection = new ServiceConnection(){
+    private ArrayList<song> songList;
+    private ListView songView;
+    //private MusicService musicSrv;
+    private Intent playIntent;
+    private boolean musicBound=false;
+    //connect to the service
+    private ServiceConnection musicConnection = new ServiceConnection(){
 
-		@Override
-		public void onServiceConnected(ComponentName name, IBinder service) {
-			MusicBinder binder = (MusicBinder)service;
-			//get service
-			musicSrv = binder.getService();
-			//pass list
-			musicSrv.setList(songList);
-			musicBound = true;
-		}
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            MusicBinder binder = (MusicBinder)service;
+            //get service
+            MainActivity.musicSrv = binder.getService();
+            //pass list
+            MainActivity.musicSrv.setList(songList);
+            musicBound = true;
+        }
 
-		@Override
-		public void onServiceDisconnected(ComponentName name) {
-			musicBound = false;
-		}
-	};
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            musicBound = false;
+        }
+    };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -60,76 +60,76 @@ public class FragmentPlayList extends Fragment implements View.OnClickListener{
         songList = new ArrayList<song>();
         getSongList();
         Collections.sort(songList, new Comparator<song>() {
-			public int compare(song a, song b) {
-				return a.getTitle().compareTo(b.getTitle());
-			}
-		});
+            public int compare(song a, song b) {
+                return a.getTitle().compareTo(b.getTitle());
+            }
+        });
         SongAdapter songAdt = new SongAdapter(this, faActivity, songList);
         songView.setAdapter(songAdt);
 
         return RLayout; // We must return the loaded Layout
     }
 
-	@Override
-	public void onStart() {
-		super.onStart();
-		if(playIntent==null){
-			playIntent = new Intent(this.getActivity(), MusicService.class);
-			this.getActivity().bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
-			this.getActivity().startService(playIntent);
-		}
-	}
+    @Override
+    public void onStart() {
+        super.onStart();
+        if(playIntent==null){
+            playIntent = new Intent(this.getActivity(), MusicService.class);
+            this.getActivity().bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
+            this.getActivity().startService(playIntent);
+        }
+    }
 
-	@Override
-	public void onDestroy(){
-		this.getActivity().stopService(playIntent);
-		musicSrv=null;
-		super.onDestroy();
-	}
+    @Override
+    public void onDestroy(){
+        this.getActivity().stopService(playIntent);
+        MainActivity.musicSrv=null;
+        super.onDestroy();
+    }
 
-	public void songPicked(View view) {
-		musicSrv.setSong(Integer.parseInt(view.getTag().toString()));
-		musicSrv.playSong();
-	}
+    public void songPicked(View view) {
+        MainActivity.musicSrv.setSong(Integer.parseInt(view.getTag().toString()));
+        //musicSrv.playSong();
+    }
 
-	public void getSongList() {
+    public void getSongList() {
         FragmentActivity faActivity  = (FragmentActivity) super.getActivity();
         //retrieve song info
-		ContentResolver musicResolver = faActivity.getContentResolver();
-		Uri musicUri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-		Cursor musicCursor = musicResolver.query(musicUri, null, null, null, null);
-		if(musicCursor!=null && musicCursor.moveToFirst()){
-			  //get columns
-			  int titleColumn = musicCursor.getColumnIndex
-			    (android.provider.MediaStore.Audio.Media.TITLE);
-			  int idColumn = musicCursor.getColumnIndex
-			    (android.provider.MediaStore.Audio.Media._ID);
-			  int artistColumn = musicCursor.getColumnIndex
-			    (android.provider.MediaStore.Audio.Media.ARTIST);
-			  //add songs to list
-			  do {
-			    long thisId = musicCursor.getLong(idColumn);
-			    String thisTitle = musicCursor.getString(titleColumn);
-			    String thisArtist = musicCursor.getString(artistColumn);
-			    songList.add(new song(thisId, thisTitle, thisArtist));
-			  }
-			  while (musicCursor.moveToNext());
-		}
-	}
+        ContentResolver musicResolver = faActivity.getContentResolver();
+        Uri musicUri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        Cursor musicCursor = musicResolver.query(musicUri, null, null, null, null);
+        if(musicCursor!=null && musicCursor.moveToFirst()){
+            //get columns
+            int titleColumn = musicCursor.getColumnIndex
+                    (android.provider.MediaStore.Audio.Media.TITLE);
+            int idColumn = musicCursor.getColumnIndex
+                    (android.provider.MediaStore.Audio.Media._ID);
+            int artistColumn = musicCursor.getColumnIndex
+                    (android.provider.MediaStore.Audio.Media.ARTIST);
+            //add songs to list
+            do {
+                long thisId = musicCursor.getLong(idColumn);
+                String thisTitle = musicCursor.getString(titleColumn);
+                String thisArtist = musicCursor.getString(artistColumn);
+                songList.add(new song(thisId, thisTitle, thisArtist));
+            }
+            while (musicCursor.moveToNext());
+        }
+    }
 
-	@Override
-	public void onClick(View v) {
-		switch (v.getId()) {
-			case R.id.ASong:
-				songPicked(v);
-				//getActivity().setContentView(R.layout.player_page);
-				getFragmentManager().beginTransaction().replace(R.id.playlistPage,new FragmentMusicPlayer()).commit();
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.ASong:
+                songPicked(v);
+                //getActivity().setContentView(R.layout.player_page);
+                getFragmentManager().beginTransaction().replace(R.id.playlistPage,new FragmentMusicPlayer()).commit();
 
-				//getFragmentManager().beginTransaction().remove(this).commit();
-				break;
-			default:
-				Log.i("default:", "default");
-				break;
-		}
-	}
+                //getFragmentManager().beginTransaction().remove(this).commit();
+                break;
+            default:
+                Log.i("default:", "default");
+                break;
+        }
+    }
 }
