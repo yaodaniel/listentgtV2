@@ -56,6 +56,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 //    static FragmentPlayList playlistFrag;
     String[] pages = new String[]{"Play", "Connect", "Settings"};
 
+//    static public MusicService musicSrv;
+
     //WiFiP2pManager variables
     public static final String TAG = "ListenTGT";
     private WifiP2pManager manager;
@@ -67,7 +69,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     private BroadcastReceiver receiver = null;
 
     //keep track of fragments
-    private static Fragment fragment1 = new FragmentMusicPlayer();
+    private static Fragment fragment1 = new FragmentPlayList();
     private static Fragment fragment2 = new DeviceListFragment();
     //settings fragment to be set
     private static Fragment fragment3;
