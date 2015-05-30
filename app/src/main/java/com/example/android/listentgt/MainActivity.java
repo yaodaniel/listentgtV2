@@ -46,6 +46,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
      */
     ViewPager mViewPager;
     static FragmentPlayList playlistFrag;
+    static public MusicService musicSrv;
     String[] pages = new String[]{"Play", "Connect", "Settings"};
 
     public void onCreate(Bundle savedInstanceState) {

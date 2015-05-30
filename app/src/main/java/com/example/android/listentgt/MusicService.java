@@ -4,7 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.IBinder;
-
+import java.util.Random;
 import java.util.ArrayList;
 import android.content.ContentUris;
 import android.media.AudioManager;
@@ -25,6 +25,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     //current position
     private int songPosn;
     private final IBinder musicBind = new MusicBinder();
+    private boolean newSong = true;
 
     public void onCreate() {
         //create the service
@@ -82,20 +83,68 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         //start playback
         mp.start();
     }
+    public boolean isPlaying() {
+        return player.isPlaying();
+    }
+    public void pause() {
+        player.pause();
+    }
+
+    public void play() {
+        if (newSong) {
+            playSong();
+            //updateSeekBar.start();
+        }
+        else {
+            player.start();
+            // updateSeekBar.start();
+        }
+    }
+
+    public void playnext() {                //play the next song
+
+        if (songPosn != songs.size() - 1) {
+            songPosn++;
+            playSong();
+        }
+    }
+
+    public void playprev() {                //play previous song
+        if (songPosn != 0) {
+            songPosn--;
+            playSong();
+        }
+    }
+
+    public void shuffle()                 //play random song
+    {
+        int min = 0;
+        int max = songs.size() - 1;
+        Random random = new Random();
+        songPosn = random.nextInt(max - min + 1) + min;
+        playSong();
+
+    }
+
+    public void playrepeat() {
+        playSong();
+
+    }
 
     public void playSong(){
         //play a song
+        newSong = false;
         player.reset();
         //get song
         song playSong = songs.get(songPosn);
         //get id
         long currSong = playSong.getID();
+
         //set uri
-        Uri trackUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,currSong);
-        try{
+        Uri trackUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, currSong);
+        try {
             player.setDataSource(getApplicationContext(), trackUri);
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             Log.e("MUSIC SERVICE", "Error setting data source", e);
         }
         player.prepareAsync();
