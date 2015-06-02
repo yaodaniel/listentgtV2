@@ -1,9 +1,11 @@
 package com.example.android.listentgt;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.res.ResourcesCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,10 +19,17 @@ import java.util.concurrent.TimeUnit;
 
 public class FragmentMusicPlayer extends Fragment implements View.OnClickListener, SeekBar.OnSeekBarChangeListener{
 
-    SeekBar songProgressBar;
-    TextView songCurrentDur;
-    TextView songTotalDur;
+    private SeekBar songProgressBar;
+    private TextView songCurrentDur;
+    private TextView songTotalDur;
+    private ImageButton repeatButton;
+    private ImageButton shuffleButton;
     private Handler seekHandler;
+    private ImageButton playButton;
+    private TextView songTitle;
+    private boolean repeatToggle = false;
+    private boolean shuffleToggle = false;
+    private boolean playToggle = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -28,13 +37,15 @@ public class FragmentMusicPlayer extends Fragment implements View.OnClickListene
         // Replace LinearLayout by the type of the root element of the layout you're trying to load
         RelativeLayout RLayout  = (RelativeLayout)  inflater.inflate(R.layout.player_page, container, false);
 
+        songTitle = (TextView)RLayout.findViewById(R.id.songTitle);
         ImageButton playlistButton = (ImageButton)RLayout.findViewById(R.id.btnPlaylist);
         songProgressBar = (SeekBar)RLayout.findViewById(R.id.songProgressBar);    //Seeker Bar
-        ImageButton repeatButton = (ImageButton)RLayout.findViewById(R.id.btnRepeat);
+        repeatButton = (ImageButton)RLayout.findViewById(R.id.btnRepeat);
         ImageButton previousButton= (ImageButton)RLayout.findViewById(R.id.btnPrevious);
-        ImageButton playButton = (ImageButton)RLayout.findViewById(R.id.btnPlay);
+        playButton = (ImageButton)RLayout.findViewById(R.id.btnPlay);
+        playButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.img_btn_pause, null));
         ImageButton nextButton = (ImageButton)RLayout.findViewById(R.id.btnNext);
-        ImageButton shuffleButton = (ImageButton)RLayout.findViewById(R.id.btnShuffle);
+        shuffleButton = (ImageButton)RLayout.findViewById(R.id.btnShuffle);
         songCurrentDur = (TextView)RLayout.findViewById(R.id.songCurrentDurationLabel);
         songTotalDur = (TextView)RLayout.findViewById(R.id.songTotalDurationLabel);
 
@@ -58,6 +69,7 @@ public class FragmentMusicPlayer extends Fragment implements View.OnClickListene
         public void run() {
             //if(MainActivity.musicSrv.isPlaying()) {
             //Log.i("updateSeekBarTime:", "Running");
+            songTitle.setText(MainActivity.musicSrv.getSong().getTitle() + " - " + MainActivity.musicSrv.getSong().getArtists());
             int curSeconds = (MainActivity.musicSrv.getPosn() / 1000) % 60;
             long curMinutes = ((MainActivity.musicSrv.getPosn() - curSeconds) / 1000) / 60;
             int totSeconds = (MainActivity.musicSrv.getDur() / 1000) % 60;
@@ -79,8 +91,18 @@ public class FragmentMusicPlayer extends Fragment implements View.OnClickListene
                 break;
             case R.id.btnRepeat:
                 MainActivity.musicSrv.playrepeat();
+                if(repeatToggle)
+                    repeatButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.img_btn_repeat, null));
+                else
+                    repeatButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.img_btn_repeat_pressed, null));
+                repeatToggle = !repeatToggle;
                 break;
             case R.id.btnPlay:
+                if(playToggle)
+                    playButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.img_btn_pause, null));
+                else
+                    playButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.img_btn_play, null));
+                playToggle = !playToggle;
                 if(MainActivity.musicSrv.isPlaying())
                     MainActivity.musicSrv.pause();
                 else
@@ -94,6 +116,11 @@ public class FragmentMusicPlayer extends Fragment implements View.OnClickListene
                 break;
             case R.id.btnShuffle:
                 MainActivity.musicSrv.shuffle();
+                if(shuffleToggle)
+                    shuffleButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.img_btn_shuffle, null));
+                else
+                    shuffleButton.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.img_btn_shuffle_pressed, null));
+                shuffleToggle = !shuffleToggle;
                 break;
             default:
                 Log.i("MusicPlayer default:", "default");
