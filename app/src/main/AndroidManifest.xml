@@ -23,7 +23,6 @@
 
     <!-- setup permissions required for this application -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -37,11 +36,11 @@
     <application
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@android:style/Theme.Holo.Light.DarkActionBar">
+        android:theme="@android:style/Theme.Holo.Light.DarkActionBar" >
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -56,12 +55,10 @@
             android:name=".FragmentMusicPlayer"
             android:label="@string/app_name" >
         </fragment>
-
         <fragment
             android:name=".FragmentPlayList"
             android:label="@string/app_name" >
         </fragment>
-
 
         <service android:name=".MusicService" />
 
@@ -70,6 +67,12 @@
             android:enabled="true"
             android:exported="true" >
         </receiver>
+
+        <service
+            android:name=".FileTransferService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
     </application>
 
 </manifest>
