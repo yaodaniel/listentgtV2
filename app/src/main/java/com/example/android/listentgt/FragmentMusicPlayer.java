@@ -1,6 +1,5 @@
 package com.example.android.listentgt;
 
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -15,8 +14,6 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import java.util.concurrent.TimeUnit;
-
 public class FragmentMusicPlayer extends Fragment implements View.OnClickListener, SeekBar.OnSeekBarChangeListener{
 
     private SeekBar songProgressBar;
@@ -30,7 +27,6 @@ public class FragmentMusicPlayer extends Fragment implements View.OnClickListene
     private boolean repeatToggle = false;
     private boolean shuffleToggle = false;
     private boolean playToggle = false;
-    private int curPos, totPos;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -60,8 +56,6 @@ public class FragmentMusicPlayer extends Fragment implements View.OnClickListene
         shuffleButton.setOnClickListener(this);
 
         //RLayout.setOnClickListener(this);
-        curPos = 0;
-        totPos = 0;
         seekHandler = new Handler();
         seekHandler.post(updateSeekBarTime);
         return RLayout; // We must return the loaded Layout

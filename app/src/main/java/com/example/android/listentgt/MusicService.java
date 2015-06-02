@@ -13,8 +13,6 @@ import android.os.Binder;
 import android.os.PowerManager;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.widget.RelativeLayout;
-import android.widget.SeekBar;
 /**
  * Created by DanielY on 5/24/2015.
  */
@@ -171,19 +169,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     }
 
     public int getDur() {
-        /*player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-
-            public void onPrepared(MediaPlayer mp) {
-                int duration = player.getDuration();
-                return duration;
-
-            }
-        });
-        try {
-            player.prepare();
-        } catch (Exception e) {
-
-        }*/
         return duration;
     }
 
