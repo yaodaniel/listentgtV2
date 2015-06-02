@@ -1,5 +1,6 @@
 package com.example.android.listentgt;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -13,6 +14,8 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+
+import java.util.concurrent.TimeUnit;
 
 public class FragmentMusicPlayer extends Fragment implements View.OnClickListener, SeekBar.OnSeekBarChangeListener{
 
@@ -68,16 +71,14 @@ public class FragmentMusicPlayer extends Fragment implements View.OnClickListene
         @Override
         public void run() {
             if(MainActivity.musicSrv.player != null && MainActivity.musicSrv.getPosn() < MainActivity.musicSrv.getDur()) {
-                curPos = MainActivity.musicSrv.getPosn();
-                totPos = MainActivity.musicSrv.getDur();
-                if (songProgressBar.getMax() != totPos)
-                    songProgressBar.setMax(totPos);
-                songProgressBar.setProgress(curPos);
+                if (songProgressBar.getMax() != MainActivity.musicSrv.getDur())
+                    songProgressBar.setMax(MainActivity.musicSrv.getDur());
+                songProgressBar.setProgress(MainActivity.musicSrv.getPosn());
                 songTitle.setText(MainActivity.musicSrv.getSong().getTitle() + " - " + MainActivity.musicSrv.getSong().getArtists());
-                int curSeconds = (curPos / 1000) % 60;
-                long curMinutes = ((curPos - curSeconds) / 1000) / 60;
-                int totSeconds = (totPos / 1000) % 60;
-                long totMinutes = ((totPos - totSeconds) / 1000) / 60;
+                int curSeconds = (MainActivity.musicSrv.getPosn() / 1000) % 60;
+                long curMinutes = ((MainActivity.musicSrv.getPosn() - curSeconds) / 1000) / 60;
+                int totSeconds = (MainActivity.musicSrv.getDur() / 1000) % 60;
+                long totMinutes = ((MainActivity.musicSrv.getDur() - totSeconds) / 1000) / 60;
                 songCurrentDur.setText(String.format("%d:%02d", curMinutes, curSeconds));
                 songTotalDur.setText(String.format("%d:%02d", totMinutes, totSeconds));
             }

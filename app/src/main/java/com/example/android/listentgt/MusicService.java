@@ -25,7 +25,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     //song list
     private ArrayList<song> songs;
     //current position
-    private int songPosn;
+    private int songPosn, duration;
     private final IBinder musicBind = new MusicBinder();
     private boolean newSong = true, shuffleOn = false, repeatOn = false;
 
@@ -96,6 +96,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public void onPrepared(MediaPlayer mp) {
         //start playback
         mp.start();
+        duration = mp.getDuration();
     }
     public boolean isPlaying() {
         return player.isPlaying();
@@ -164,11 +165,26 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     }
 
     public int getPosn() {
-        return player.getCurrentPosition();
+        if(player != null)
+            return player.getCurrentPosition();
+        return 0;
     }
 
     public int getDur() {
-        return player.getDuration();
+        /*player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+
+            public void onPrepared(MediaPlayer mp) {
+                int duration = player.getDuration();
+                return duration;
+
+            }
+        });
+        try {
+            player.prepare();
+        } catch (Exception e) {
+
+        }*/
+        return duration;
     }
 
     public song getSong() {
