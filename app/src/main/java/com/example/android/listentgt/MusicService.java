@@ -88,6 +88,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     @Override
     public boolean onError(MediaPlayer mp, int what, int extra) {
+        player.reset();
         return false;
     }
 

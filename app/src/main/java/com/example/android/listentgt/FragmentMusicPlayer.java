@@ -1,6 +1,5 @@
 package com.example.android.listentgt;
 
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -15,8 +14,6 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import java.util.concurrent.TimeUnit;
-
 public class FragmentMusicPlayer extends Fragment implements View.OnClickListener, SeekBar.OnSeekBarChangeListener{
 
     private SeekBar songProgressBar;
@@ -30,6 +27,7 @@ public class FragmentMusicPlayer extends Fragment implements View.OnClickListene
     private boolean repeatToggle = false;
     private boolean shuffleToggle = false;
     private boolean playToggle = false;
+    private int curPos, totPos;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -59,6 +57,8 @@ public class FragmentMusicPlayer extends Fragment implements View.OnClickListene
         shuffleButton.setOnClickListener(this);
 
         //RLayout.setOnClickListener(this);
+        curPos = 0;
+        totPos = 0;
         seekHandler = new Handler();
         seekHandler.post(updateSeekBarTime);
         return RLayout; // We must return the loaded Layout
@@ -67,19 +67,21 @@ public class FragmentMusicPlayer extends Fragment implements View.OnClickListene
     private Runnable updateSeekBarTime = new Runnable() {
         @Override
         public void run() {
-            //if(MainActivity.musicSrv.isPlaying()) {
-            //Log.i("updateSeekBarTime:", "Running");
-            songTitle.setText(MainActivity.musicSrv.getSong().getTitle() + " - " + MainActivity.musicSrv.getSong().getArtists());
-            int curSeconds = (MainActivity.musicSrv.getPosn() / 1000) % 60;
-            long curMinutes = ((MainActivity.musicSrv.getPosn() - curSeconds) / 1000) / 60;
-            int totSeconds = (MainActivity.musicSrv.getDur() / 1000) % 60;
-            long totMinutes = ((MainActivity.musicSrv.getDur() - totSeconds) / 1000) / 60;
-            songCurrentDur.setText(String.format("%d:%02d", curMinutes, curSeconds));
-            songTotalDur.setText(String.format("%d:%02d", totMinutes, totSeconds));
-            songProgressBar.setMax(MainActivity.musicSrv.getDur());
-            songProgressBar.setProgress(MainActivity.musicSrv.getPosn());
-            seekHandler.postDelayed(updateSeekBarTime, 1000);
-            //}
+            if(MainActivity.musicSrv.player != null && MainActivity.musicSrv.getPosn() < MainActivity.musicSrv.getDur()) {
+                curPos = MainActivity.musicSrv.getPosn();
+                totPos = MainActivity.musicSrv.getDur();
+                if (songProgressBar.getMax() != totPos)
+                    songProgressBar.setMax(totPos);
+                songProgressBar.setProgress(curPos);
+                songTitle.setText(MainActivity.musicSrv.getSong().getTitle() + " - " + MainActivity.musicSrv.getSong().getArtists());
+                int curSeconds = (curPos / 1000) % 60;
+                long curMinutes = ((curPos - curSeconds) / 1000) / 60;
+                int totSeconds = (totPos / 1000) % 60;
+                long totMinutes = ((totPos - totSeconds) / 1000) / 60;
+                songCurrentDur.setText(String.format("%d:%02d", curMinutes, curSeconds));
+                songTotalDur.setText(String.format("%d:%02d", totMinutes, totSeconds));
+            }
+                seekHandler.postDelayed(updateSeekBarTime, 500);
         }
     };
     @Override
@@ -130,9 +132,6 @@ public class FragmentMusicPlayer extends Fragment implements View.OnClickListene
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        if(fromUser) {
-            MainActivity.musicSrv.player.seekTo((int)(((double)progress/100)*MainActivity.musicSrv.getDur()));
-        }
     }
 
     @Override
@@ -141,6 +140,7 @@ public class FragmentMusicPlayer extends Fragment implements View.OnClickListene
 
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
+        MainActivity.musicSrv.player.seekTo(seekBar.getProgress());
     }
 }
 
