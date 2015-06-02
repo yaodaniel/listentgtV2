@@ -208,11 +208,11 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
 
         void showDetails(WifiP2pDevice device);
 
-        void cancelDisconnect();
-
+//        void cancelDisconnect();
+//
         void connect(WifiP2pConfig config);
-
-        void disconnect();
+//
+//        void disconnect();
     }
 
 }
