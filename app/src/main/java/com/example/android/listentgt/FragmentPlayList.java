@@ -6,6 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.ListView;
 import android.view.LayoutInflater;
@@ -106,12 +107,15 @@ public class FragmentPlayList extends Fragment implements View.OnClickListener{
                     (android.provider.MediaStore.Audio.Media._ID);
             int artistColumn = musicCursor.getColumnIndex
                     (android.provider.MediaStore.Audio.Media.ARTIST);
+            int albumColumn = musicCursor.getColumnIndex
+                    (MediaStore.Audio.Albums.ALBUM_ART); //For album art possible future step
             //add songs to list
             do {
                 long thisId = musicCursor.getLong(idColumn);
                 String thisTitle = musicCursor.getString(titleColumn);
                 String thisArtist = musicCursor.getString(artistColumn);
-                songList.add(new song(thisId, thisTitle, thisArtist));
+                String thisAlbumCover = "";
+                songList.add(new song(thisId, thisTitle, thisArtist, thisAlbumCover));
             }
             while (musicCursor.moveToNext());
         }
@@ -123,9 +127,10 @@ public class FragmentPlayList extends Fragment implements View.OnClickListener{
             case R.id.ASong:
                 songPicked(v);
                 //getActivity().setContentView(R.layout.player_page);
-                getFragmentManager().beginTransaction().replace(R.id.playlistPage,new FragmentMusicPlayer()).commit();
-
-                //getFragmentManager().beginTransaction().remove(this).commit();
+                getFragmentManager().beginTransaction().replace(R.id.playlistPage, new FragmentMusicPlayer()).commit();
+                //getFragmentManager().beginTransaction().detach(this).attach(new FragmentMusicPlayer()).commit();
+                //getFragmentManager().beginTransaction().hide(this).commit();
+                //getFragmentManager().beginTransaction().show(new FragmentMusicPlayer()).commit();
                 break;
             default:
                 Log.i("default:", "default");

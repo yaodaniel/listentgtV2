@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/playlistPage"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <TextView
+        android:id="@+id/settingsMenu_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:textSize="25sp"
+        android:text="Settings" />
+
+    <ListView
+        android:layout_below="@+id/settingsMenu_header"
+        android:id="@+id/settings_list"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
+    </ListView>
+    <!--
+        <Button
+        android:id="@+id/Connect"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="Connect via Bluetooth" />
+    -->
+</RelativeLayout>
