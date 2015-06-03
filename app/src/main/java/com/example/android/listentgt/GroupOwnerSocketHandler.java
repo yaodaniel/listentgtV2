@@ -281,7 +281,7 @@ public class GroupOwnerSocketHandler extends Thread
             return;
         }
 
-        String command = PLAY_CMD + CMD_DELIMITER + fileName;
+        String command = PLAY_CMD + CMD_DELIMITER + fileName + CMD_DELIMITER;
 
         Log.d(TAG, "Sending command: " + command);
 
@@ -289,6 +289,20 @@ public class GroupOwnerSocketHandler extends Thread
         {
             sendCommand(s, command);
         }
+    }
+
+    public void sendContinue()
+    {
+
+        String command = PLAY_CMD + CMD_DELIMITER;
+
+        Log.d(TAG, "Sending command: " + command);
+
+        for (Socket s : connections)
+        {
+            sendCommand(s, command);
+        }
+
     }
 
     public void sendStop()

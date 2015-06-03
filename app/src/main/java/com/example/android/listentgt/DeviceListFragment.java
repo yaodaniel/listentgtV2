@@ -290,8 +290,19 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
                 String[] cmdString = readMessage
                         .split(GroupOwnerSocketHandler.CMD_DELIMITER);
 
+                Log.i("ClientSocketHandler", readMessage);
+
                 if (cmdString[0].equals(GroupOwnerSocketHandler.PLAY_CMD)
-                        && cmdString.length > 1)
+                    && cmdString.length == 2)
+                 {
+                    //continue playing
+                    Log.i("Client handling music", "continue to play" );
+
+                    ((DeviceActionListener) getActivity()).clientContinueMusic();
+
+                 }
+                else if (cmdString[0].equals(GroupOwnerSocketHandler.PLAY_CMD)
+                        && cmdString.length > 2)
                 {
                     try
                     {
@@ -477,6 +488,13 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
         }
     }
 
+    public void continueMusicOnClients()
+    {
+        Log.i("Music Service", "Continue music on clients called.");
+        serverThread.sendContinue();
+
+    }
+
     public void stopMusicOnClients()
     {
         if (serverThread != null)
@@ -511,6 +529,8 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
         void stopMusic();
 
         void clientPlayMusic(String URL);
+
+        void clientContinueMusic();
     }
 
 }

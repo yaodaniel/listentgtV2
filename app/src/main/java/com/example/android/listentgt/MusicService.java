@@ -126,12 +126,23 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     }
 
+    //if the player is a server, should also handle the client player control
     public void play() {
+        Log.i("Play", "Playcalled");
         if (newSong) {
+            Log.i("Play", "Play a new song");
             playSong();
         }
         else {
+            Log.i("Play", "Continue Playing");
             player.start();
+            //if it is a server
+            if (((DeviceListFragment) MainActivity.getFragment2()).getIsServer() && !((DeviceListFragment) MainActivity.getFragment2()).getIsClient())
+            {
+                //continue playing on client too
+                DeviceListFragment fragment = (DeviceListFragment) MainActivity.getFragment2();
+                fragment.continueMusicOnClients();
+            }
         }
     }
 
@@ -163,16 +174,20 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         //play a song
         newSong = false;
         player.reset();
-        //get song
-        song playSong = songs.get(songPosn);
-        //get id
-        long currSong = playSong.getID();
 
-        //set uri
-        Uri trackUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, currSong);
+
+
 
         //not a server and not a client
         if(!((DeviceListFragment) MainActivity.getFragment2()).getIsServer() && !((DeviceListFragment) MainActivity.getFragment2()).getIsClient()) {
+
+            //get song
+            song playSong = songs.get(songPosn);
+            //get id
+            long currSong = playSong.getID();
+
+            //set uri
+            Uri trackUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, currSong);
 
             try {
                 player.setDataSource(getApplicationContext(), trackUri);
@@ -185,6 +200,14 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         else if (((DeviceListFragment) MainActivity.getFragment2()).getIsServer() && !((DeviceListFragment) MainActivity.getFragment2()).getIsClient())
         {
             Log.i("Music Service", "Server in music service trying to broadcast music");
+
+            //get song
+            song playSong = songs.get(songPosn);
+            //get id
+            long currSong = playSong.getID();
+
+            //set uri
+            Uri trackUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, currSong);
 
             try {
                 player.setDataSource(getApplicationContext(), trackUri);
@@ -208,13 +231,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     //play song as a client
     public void clientPlaySong(String url){
-        //play a song
-//        if(newSong == false) {
-//            player.start();
-//            Log.i("ClientPlaySong", "Playing an Old Song");
-//
-//        }
-//        else {
+
             Log.i("ClientPlaySong", "Playing A New Song");
             newSong = false;
             player.reset();
