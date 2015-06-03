@@ -1,8 +1,16 @@
 package com.example.android.listentgt;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.net.Uri;
+import android.net.wifi.WpsInfo;
+import android.net.wifi.p2p.WifiP2pInfo;
+import android.net.wifi.p2p.WifiP2pManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,27 +35,77 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
+
+import NanoHTTPD.NanoHTTPD;
+import NanoHTTPD.SimpleWebServer;
 
 /**
  * A ListFragment that displays available peers on discovery and requests the
  * parent activity to handle user interaction events
  */
-public class DeviceListFragment extends ListFragment implements PeerListListener {
+public class DeviceListFragment extends ListFragment implements PeerListListener, WifiP2pManager.ConnectionInfoListener, Handler.Callback {
 
     private List<WifiP2pDevice> peers = new ArrayList<WifiP2pDevice>();
     ProgressDialog progressDialog = null;
     View mContentView = null;
     private WifiP2pDevice device;
 
+    //handler
+    private final Handler handler = new Handler(this);
+
+
+    //ServerThread variables
+    private GroupOwnerSocketHandler serverThread;
+    private ClientSocketHandler clientThread;
+    private String httpHostIP = null;
+    private Activity mActivity = getActivity();
+
+    private File wwwroot = null;
+    private NanoHTTPD httpServer = null;
+    public static final int HTTP_PORT = 9002;
+
+    private WifiP2pInfo info;
+
+    private static boolean isServer = false;
+    private static boolean isClient = false;
+
+    //get whether I am server or client
+    public boolean getIsServer() {
+        return isServer;
+    }
+
+    public boolean getIsClient() {
+        return isClient;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         this.setListAdapter(new WiFiPeerListAdapter(getActivity(), R.layout.row_devices, peers));
+
     }
 
+    @Override
+    public void onAttach(Activity activity)
+    {
+        super.onAttach(activity);
+        mActivity = activity;
+
+        // get the application directory
+        wwwroot = mActivity.getApplicationContext().getFilesDir();
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mContentView = inflater.inflate(R.layout.device_list, null);
@@ -83,12 +141,29 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
     }
 
     /**
-     * Initiate a connection with the peer.
+     * Initiate a connection with the peer when listItem clicked.
      */
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         WifiP2pDevice device = (WifiP2pDevice) getListAdapter().getItem(position);
-        ((DeviceActionListener) getActivity()).showDetails(device);
+        WifiP2pConfig config = new WifiP2pConfig();
+        config.deviceAddress = device.deviceAddress;
+        config.wps.setup = WpsInfo.PBC;
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
+        progressDialog = ProgressDialog.show(getActivity(), "Press back to cancel",
+                "Connecting to :" + device.deviceAddress, true, true
+//                        new DialogInterface.OnCancelListener() {
+//
+//                            @Override
+//                            public void onCancel(DialogInterface dialog) {
+//                                ((DeviceActionListener) getActivity()).cancelDisconnect();
+//                            }
+//                        }
+        );
+        ((DeviceActionListener) getActivity()).connect(config);
+
     }
 
     /**
@@ -142,10 +217,13 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
      */
     public void updateThisDevice(WifiP2pDevice device) {
         this.device = device;
-//        TextView view = (TextView) mContentView.findViewById(R.id.my_name);
-//        view.setText(device.deviceName);
-//        view = (TextView) mContentView.findViewById(R.id.my_status);
-//        view.setText(getDeviceStatus(device.status));
+        //this is buggish, I dunno why
+        if (MainActivity.getCurrentFragment() == MainActivity.getFragment2()) {
+            TextView view = (TextView) mContentView.findViewById(R.id.my_name);
+            view.setText(device.deviceName);
+            view = (TextView) mContentView.findViewById(R.id.my_status);
+            view.setText(getDeviceStatus(device.status));
+        }
     }
 
     @Override
@@ -171,7 +249,7 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
 
     public void clearPeers() {
         peers.clear();
-        ((WiFiPeerListAdapter) getListAdapter()).notifyDataSetChanged();
+//        ((WiFiPeerListAdapter) getListAdapter()).notifyDataSetChanged();
     }
 
     /**
@@ -181,15 +259,6 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
         }
-//        progressDialog = ProgressDialog.show(this.getParent(), "Press back to cancel", "finding peers", true,
-//                true, new DialogInterface.OnCancelListener() {
-//
-//                    @Override
-//                    public void onCancel(DialogInterface dialog) {
-//
-//                    }
-//                });
-
         progressDialog = ProgressDialog.show(activity, "Press back to cancel", "finding peers", true,
                 true, new DialogInterface.OnCancelListener() {
 
@@ -198,8 +267,231 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
 
                     }
                 });
+
     }
 
+    //Handler.Callback
+    @Override
+    public boolean handleMessage(Message msg)
+    {
+        switch (msg.what)
+        {
+            case GroupOwnerSocketHandler.SERVER_CALLBACK:
+                serverThread = (GroupOwnerSocketHandler) msg.obj;
+                Log.d(MainActivity.TAG, "Retrieved server thread.");
+                break;
+            //Deal with received message
+            case ClientSocketHandler.EVENT_RECEIVE_MSG:
+                byte[] readBuf = (byte[]) msg.obj;
+                // construct a string from the valid bytes in the buffer
+                String readMessage = new String(readBuf);
+
+                // interpret the command
+                String[] cmdString = readMessage
+                        .split(GroupOwnerSocketHandler.CMD_DELIMITER);
+
+                if (cmdString[0].equals(GroupOwnerSocketHandler.PLAY_CMD)
+                        && cmdString.length > 1)
+                {
+                    try
+                    {
+                        Log.i("Client handling music", "trying to play" );
+
+                        ((DeviceActionListener) getActivity()).clientPlayMusic(
+                                cmdString[1]);
+                    }
+                    catch (NumberFormatException e)
+                    {
+                        Log.e(MainActivity.TAG,
+                                "Could not convert to a proper time for these two strings: "
+                                        + cmdString[2] + " and " + cmdString[3],
+                                e);
+                    }
+                }
+                else if (cmdString[0].equals(GroupOwnerSocketHandler.STOP_CMD)
+                        && cmdString.length > 0)
+                {
+                    ((DeviceActionListener) getActivity()).stopMusic();
+                }
+
+                Log.d(MainActivity.TAG, readMessage);
+
+                // Toast.makeText(mContentView.getContext(),
+                // "Received message: " + readMessage, Toast.LENGTH_SHORT)
+                // .show();
+                break;
+
+            case ClientSocketHandler.CLIENT_CALLBACK:
+                clientThread = (ClientSocketHandler) msg.obj;
+                Log.d(MainActivity.TAG, "Retrieved client thread.");
+                break;
+
+            default:
+                Log.d(MainActivity.TAG, "I thought we heard something? Message type: "
+                        + msg.what);
+                break;
+        }
+        return true;
+    }
+
+
+    //ConnectionInfoListener
+
+    //onConnectionInfoAvailable is triggered when you have info available
+    @Override
+    public void onConnectionInfoAvailable(final WifiP2pInfo info) {
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
+        this.info = info;
+
+        // After the group negotiation, we assign the group owner as the file
+        // server. The file server is single threaded, single connection server
+        // socket.
+        if (info.groupFormed && info.isGroupOwner) {
+
+            //start the server thread
+            try
+            {
+                isServer = true;
+                isClient = false;
+                // WARNING:
+                // depends on the timing, if we don't get a server back in time,
+                // we may end up running multiple threads of the server
+                // instance!
+                if (this.serverThread == null)
+                {
+                    Thread server = new GroupOwnerSocketHandler(this.handler);
+                    server.start();
+
+                    if (wwwroot != null)
+                    {
+                        if (httpServer == null)
+                        {
+                            httpHostIP = info.groupOwnerAddress
+                                    .getHostAddress();
+
+                            boolean quiet = false;
+
+                            httpServer = new SimpleWebServer(httpHostIP,
+                                    HTTP_PORT, wwwroot, quiet);
+                            try
+                            {
+                                httpServer.start();
+                                Log.d("HTTP Server",
+                                        "Started web server with IP address: "
+                                                + httpHostIP);
+                                Toast.makeText(getActivity(),
+                                        "DJ Server started.",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                            catch (IOException ioe)
+                            {
+                                Log.e("HTTP Server", "Couldn't start server:\n");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Log.e("HTTP Server",
+                                "Could not retrieve a directory for the HTTP server.");
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Log.e(MainActivity.TAG, "Cannot start server.", e);
+            }
+
+        } else if (info.groupFormed) {
+            //start the client thread
+            // WARNING:
+            // depends on the timing, if we don't get a server back in time,
+            // we may end up running multiple threads of the client
+            // instance!
+            isServer = false;
+            isClient = true;
+
+            if (this.clientThread == null)
+            {
+                Thread client = new ClientSocketHandler(this.handler,
+                        info.groupOwnerAddress);
+                client.start();
+            }
+
+            Toast.makeText(mContentView.getContext(),
+                    "Speaker client started.", Toast.LENGTH_SHORT).show();
+        }
+
+}
+
+
+
+    /**
+     * Updates the UI with device data
+     *
+     * @param device the device to be displayed
+     */
+    //no use yet
+    public void showDetails(WifiP2pDevice device) {
+//        this.device = device;
+//        this.getView().setVisibility(View.VISIBLE);
+//        TextView view = (TextView) mContentView.findViewById(R.id.device_address);
+//        view.setText(device.deviceAddress);
+//        view = (TextView) mContentView.findViewById(R.id.device_info);
+//        view.setText(device.toString());
+
+    }
+
+
+        /** Play the music on clients -- Server Function **/
+
+    //this connects to the serverThread, so when button is pressed, we send Play to the client.
+    //this prepares the music file.
+
+    public void playMusicOnClients(File musicFile)
+    {
+        if (serverThread == null)
+        {
+            Log.d(MainActivity.TAG,
+                    "Server has not started. No music will be played remotely.");
+            return;
+        }
+
+        try
+        {
+            // copy the actual file to the web server directory, then pass the
+            // URL to the client
+            File webFile = new File(wwwroot, musicFile.getName());
+
+            Utilities.copyFile(musicFile, webFile);
+
+            Uri webMusicURI = Uri.parse("http://" + httpHostIP + ":"
+                    + String.valueOf(HTTP_PORT) + "/" + webFile.getName());
+
+            serverThread.sendPlay(webMusicURI.toString());
+        }
+        catch (IOException e1)
+        {
+            Log.e("HTTP Server", "Cannot copy file.", e1);
+        }
+    }
+
+    public void stopMusicOnClients()
+    {
+        if (serverThread != null)
+        {
+            serverThread.sendStop();
+        }
+    }
+
+    /***
+     * Helper Functions
+     *
+     */
+    public String getFileFromURI(Uri path) {
+        return Utilities.getRealPathFromUri(getActivity(), path);
+    }
     /**
      * An interface-callback for the activity to listen to fragment interaction
      * events.
@@ -213,6 +505,12 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
         void connect(WifiP2pConfig config);
 //
 //        void disconnect();
+
+//        void playMusic();
+
+        void stopMusic();
+
+        void clientPlayMusic(String URL);
     }
 
 }
