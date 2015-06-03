@@ -90,7 +90,6 @@ public class FragmentPlayList extends Fragment implements View.OnClickListener{
 
     public void songPicked(View view) {
         MainActivity.musicSrv.setSong(Integer.parseInt(view.getTag().toString()));
-        //musicSrv.playSong();
     }
 
     public void getSongList() {
