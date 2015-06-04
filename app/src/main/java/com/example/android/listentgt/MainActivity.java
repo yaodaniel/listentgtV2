@@ -312,6 +312,12 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         musicSrv.pause();
     }
 
+    @Override
+    public void clientContinueMusic()
+    {
+        Log.i("Main Activity", "client continue music called");
+        musicSrv.play();
+    }
     public void playRemoteMusic(String musicFilePath)
     {
 //        ServerDeviceListFragment fragmentList = (ServerDeviceListFragment) getFragmentManager()
