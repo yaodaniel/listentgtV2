@@ -58,7 +58,7 @@ import java.net.Socket;
 import NanoHTTPD.NanoHTTPD;
 import NanoHTTPD.SimpleWebServer;
 
-public class MainActivity extends FragmentActivity implements ActionBar.TabListener, WifiP2pManager.ChannelListener, DeviceListFragment.DeviceActionListener{
+public class MainActivity extends FragmentActivity implements ActionBar.TabListener, WifiP2pManager.ChannelListener, DeviceActionListener{
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide fragments for each of the
@@ -324,7 +324,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     }
 
 
-    @Override
+    /*@Override
     public void clientPlayMusic(String url)
     {
 //        SpeakerMusicFragment fragMusic = (SpeakerMusicFragment) getFragmentManager()
@@ -335,22 +335,22 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 //            fragMusic.playSong(url, startTime, startPos);
 //        }
         musicSrv.clientPlaySong(url);
-    }
+    }*/
 
 
-    @Override
+    /*@Override
     public void stopMusic()
     {
 
         musicSrv.pause();
-    }
+    }*/
 
-    @Override
+    /*@Override
     public void clientContinueMusic()
     {
         Log.i("Main Activity", "client continue music called");
         musicSrv.play();
-    }
+    }*/
     public void playRemoteMusic(String musicFilePath)
     {
 //        ServerDeviceListFragment fragmentList = (ServerDeviceListFragment) getFragmentManager()

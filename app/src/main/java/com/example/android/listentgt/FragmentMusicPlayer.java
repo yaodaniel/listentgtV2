@@ -1,7 +1,9 @@
 package com.example.android.listentgt;
 
+import android.content.ContentUris;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.res.ResourcesCompat;
@@ -136,6 +138,8 @@ public class FragmentMusicPlayer extends Fragment implements View.OnClickListene
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
         MainActivity.musicSrv.player.seekTo(seekBar.getProgress());
+        DeviceListFragment blah = (DeviceListFragment)MainActivity.getFragment2();
+        blah.setPositionOnClients(seekBar.getProgress());
     }
 }
 

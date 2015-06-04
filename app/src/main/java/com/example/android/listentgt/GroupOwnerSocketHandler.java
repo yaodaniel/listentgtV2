@@ -50,6 +50,7 @@ public class GroupOwnerSocketHandler extends Thread
     public static final String PLAY_CMD = "PLAY";
     public static final String STOP_CMD = "STOP";
     public static final String SYNC_CMD = "SYNC";
+    public static final String SET_POSITION = "SET";
 
     public GroupOwnerSocketHandler(Handler handler) throws IOException
     {
@@ -291,6 +292,14 @@ public class GroupOwnerSocketHandler extends Thread
         }
     }
 
+    public void setPosition(int newPosition)
+    {
+        String command = SET_POSITION + CMD_DELIMITER + newPosition + CMD_DELIMITER;
+        for (Socket s : connections)
+        {
+            sendCommand(s, command);
+        }
+    }
     public void sendContinue()
     {
 

@@ -117,7 +117,7 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
         mContentView = inflater.inflate(R.layout.device_list, null);
         this.setListAdapter(new WiFiPeerListAdapter(getActivity(), R.layout.row_devices, peers));
 
-        this.updateThisDevice(device);
+        updateThisDevice(device);
         return mContentView;
     }
 
@@ -227,7 +227,9 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
         //this is buggish, I dunno why
         if (mContentView != null) {
             TextView view = (TextView) mContentView.findViewById(R.id.my_name);
+
             view.setText(Build.MODEL + ": " + device.deviceName);
+
             view = (TextView) mContentView.findViewById(R.id.my_status);
             view.setText(getDeviceStatus(device.status));
         }
@@ -304,19 +306,23 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
                  {
                     //continue playing
                     Log.i("Client handling music", "continue to play" );
-
-                    ((DeviceActionListener) getActivity()).clientContinueMusic();
+                    MainActivity.musicSrv.play();
+                    //((DeviceActionListener) getActivity()).clientContinueMusic();
 
                  }
+                else if (cmdString[0].equals(GroupOwnerSocketHandler.SET_POSITION))
+                {
+                    MainActivity.musicSrv.player.seekTo(Integer.parseInt(cmdString[1]));
+                }
                 else if (cmdString[0].equals(GroupOwnerSocketHandler.PLAY_CMD)
                         && cmdString.length > 2)
                 {
                     try
                     {
-                        Log.i("Client handling music", "trying to play" );
+                        Log.i("Client handling music", "trying to play");
 
-                        ((DeviceActionListener) getActivity()).clientPlayMusic(
-                                cmdString[1]);
+                        //((DeviceActionListener) getActivity()).clientPlayMusic(
+                              //  cmdString[1]);
                     }
                     catch (NumberFormatException e)
                     {
@@ -329,7 +335,8 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
                 else if (cmdString[0].equals(GroupOwnerSocketHandler.STOP_CMD)
                         && cmdString.length > 0)
                 {
-                    ((DeviceActionListener) getActivity()).stopMusic();
+                    MainActivity.musicSrv.pause();
+                    //((DeviceActionListener) getActivity()).stopMusic();
                 }
 
                 Log.d(MainActivity.TAG, readMessage);
@@ -529,34 +536,19 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
         }
     }
 
+    public void setPositionOnClients(int newPosition)
+    {
+        if (serverThread != null)
+        {
+            serverThread.setPosition(newPosition);
+        }
+    }
     /***
      * Helper Functions
      *
      */
     public String getFileFromURI(Uri path) {
         return Utilities.getRealPathFromUri(getActivity(), path);
-    }
-    /**
-     * An interface-callback for the activity to listen to fragment interaction
-     * events.
-     */
-    public interface DeviceActionListener {
-
-        void showDetails(WifiP2pDevice device);
-
-//        void cancelDisconnect();
-//
-        void connect(WifiP2pConfig config);
-//
-        void disconnect();
-
-//        void playMusic();
-
-        void stopMusic();
-
-        void clientPlayMusic(String URL);
-
-        void clientContinueMusic();
     }
 
 }
