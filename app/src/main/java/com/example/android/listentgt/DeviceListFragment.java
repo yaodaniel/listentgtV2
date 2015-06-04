@@ -81,6 +81,7 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
 
     private static boolean isServer = false;
     private static boolean isClient = false;
+    private static boolean clientIsReady = false;
 
     //get whether I am server or client
     public boolean getIsServer() {
@@ -359,6 +360,13 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
                 Log.d(MainActivity.TAG, "Retrieved client thread.");
                 break;
 
+            case ClientSocketHandler.CLIENT_MSG:
+                String clientMessage = (String)msg.obj;
+                clientIsReady = true;
+                Log.i("CLIENT_MSG", clientMessage);
+                Log.i("clientIsReady:", clientIsReady + "");
+                break;
+
             default:
                 Log.d(MainActivity.TAG, "I thought we heard something? Message type: "
                         + msg.what);
@@ -550,6 +558,18 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
         {
             serverThread.setPosition(newPosition);
         }
+    }
+
+    public void msgServer(String msg)
+    {
+        if (clientThread != null)
+        {
+            clientThread.msgServer(msg);
+        }
+    }
+
+    public boolean isClientReady(){
+        return clientIsReady;
     }
     /***
      * Helper Functions

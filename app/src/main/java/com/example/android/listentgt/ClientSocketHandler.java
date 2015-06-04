@@ -18,6 +18,8 @@ import java.nio.ByteBuffer;
 public class ClientSocketHandler extends Thread
 {
     private static final String TAG = "ClientSocketHandler";
+    public static final String CMD_DELIMITER = ";";
+    public static final String MSG = "MESSAGE";
     private Handler handler;
     private InetAddress mAddress;
     private Socket socket;
@@ -33,6 +35,7 @@ public class ClientSocketHandler extends Thread
 
     public static final int EVENT_RECEIVE_MSG = 100;
     public static final int CLIENT_CALLBACK = 101;
+    public static final int CLIENT_MSG = 102;
 
     //no timer for now
     public ClientSocketHandler(Handler handler, InetAddress groupOwnerAddress)
@@ -96,6 +99,7 @@ public class ClientSocketHandler extends Thread
                     Log.d(TAG, "Command sent: " + recMsg);
                 }
 
+
                 handler.obtainMessage(EVENT_RECEIVE_MSG, buffer).sendToTarget();
             }
             // this is an ok exception, because someone could have wanted this
@@ -141,6 +145,13 @@ public class ClientSocketHandler extends Thread
             Log.e(TAG, "Cannot connect to server.", e);
             disconnect();
         }
+    }
+    //send the server a msg from client
+    public void msgServer(String msg)
+    {
+        if(handler != null && socket != null)
+            handler.obtainMessage(CLIENT_MSG, msg).sendToTarget();
+
     }
 
     public void disconnect()

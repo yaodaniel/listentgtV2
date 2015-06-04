@@ -292,6 +292,7 @@ public class GroupOwnerSocketHandler extends Thread
         }
     }
 
+    //set client player to a specific position
     public void setPosition(int newPosition)
     {
         String command = SET_POSITION + CMD_DELIMITER + newPosition + CMD_DELIMITER;

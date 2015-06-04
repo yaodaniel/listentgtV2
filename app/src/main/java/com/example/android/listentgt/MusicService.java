@@ -1,6 +1,7 @@
 package com.example.android.listentgt;
 
 import android.app.Service;
+import android.bluetooth.BluetoothClass;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.IBinder;
@@ -106,6 +107,14 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     @Override
     public void onPrepared(MediaPlayer mp) {
+       DeviceListFragment frag = (DeviceListFragment) MainActivity.getFragment2();
+        if(frag.getIsClient())
+            frag.msgServer("Ready to play");
+        if(frag.getIsServer())
+            Log.i("Server: ", "Client is " + frag.isClientReady());
+            //do {
+                //Log.i("Status:" , "Not Ready");
+            //}while(!frag.isClientReady());
         //start playback
         mp.start();
         duration = mp.getDuration();
@@ -249,6 +258,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
 
             try {
+                Log.i("clientPlaySong:", "Preparing");
                 player.prepare();
                 player.seekTo(posn);
             } catch (IOException e) {
