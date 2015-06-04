@@ -6,8 +6,10 @@ import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -67,12 +69,14 @@ public class GroupOwnerSocketHandler extends Thread
         {
             try
             {
-                Log.i(TAG, "Trying to create a server");
+                Log.i(TAG, "Trying to establish a socket");
                 // let the UI thread control the server
                 handler.obtainMessage(SERVER_CALLBACK, this).sendToTarget();
 
                 // always check if the server socket is still ok to function
                 establishSocket();
+
+                Log.i(TAG, "Socket established!");
 
                 // A blocking operation to accept incoming client connections
                 Socket clientSocket = serverSocket.accept();
@@ -82,6 +86,12 @@ public class GroupOwnerSocketHandler extends Thread
                 syncClientTime(clientSocket);
 
                 connections.add(clientSocket);
+
+//                //read the message from client
+//                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+//
+//                Log.i("Reading client buffer:", in.readLine());
+
             }
             catch (IOException e)
             {

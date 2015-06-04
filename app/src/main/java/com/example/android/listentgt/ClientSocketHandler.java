@@ -134,7 +134,7 @@ public class ClientSocketHandler extends Thread
             socket.bind(null);
 
             socket.connect(new InetSocketAddress(mAddress.getHostAddress(),
-                    GroupOwnerSocketHandler.SERVER_PORT), CONN_TIMEOUT);
+                   GroupOwnerSocketHandler.SERVER_PORT), CONN_TIMEOUT);
 
             Log.d(TAG, "Connected to server");
 

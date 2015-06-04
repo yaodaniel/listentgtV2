@@ -111,6 +111,20 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
 
     @Override
     public void onDestroy() {
+        //close all connections
+        if(isClient && !isServer)
+        {
+            if(clientThread != null) {
+                clientThread.disconnect();
+            }
+        }
+        else if (isServer && !isClient)
+        {
+            if (serverThread != null) {
+                serverThread.disconnectClients();
+                serverThread.disconnectServer();
+            }
+        }
         super.onDestroy();
     }
     @Override
@@ -432,7 +446,7 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
                             try
                             {
                                 httpServer.start();
-                                Log.d("HTTP Server",
+                                Log.i("HTTP Server",
                                         "Started web server with IP address: "
                                                 + httpHostIP);
                                 Toast.makeText(getActivity(),
