@@ -336,14 +336,7 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
                     {
                         Log.i("Client handling music", "trying to play");
 
-                        MainActivity.musicSrv.clientPlaySong(cmdString[1],0);
-                        MainActivity.musicSrv.player.start();
-                        MainActivity.musicSrv.player.pause();
-                        MainActivity.musicSrv.player.start();
-                        MainActivity.musicSrv.player.pause();
-                        MainActivity.musicSrv.player.start();
-                        MainActivity.musicSrv.player.pause();
-                        MainActivity.musicSrv.clientPlaySong(cmdString[1],2500);
+                        MainActivity.musicSrv.clientPlaySong(cmdString[1],2600);
                         //((DeviceActionListener) getActivity()).clientPlayMusic(
                               //  cmdString[1]);
                     }

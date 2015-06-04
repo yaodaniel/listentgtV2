@@ -87,6 +87,16 @@ public class GroupOwnerSocketHandler extends Thread
 
                 connections.add(clientSocket);
 
+                /*for(Socket c : connections){
+                    BufferedReader in = new BufferedReader(new InputStreamReader(c.getInputStream()));
+                    String line = "default";
+                    if(in != null)
+                        line = in.readLine();
+                    if(line != null)
+                        Log.i("Reading clientSocket", in.readLine());
+                    in.close();
+                }*/
+
 //                //read the message from client
 //                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 //
