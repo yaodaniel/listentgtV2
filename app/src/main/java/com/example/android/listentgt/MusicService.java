@@ -175,9 +175,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         newSong = false;
         player.reset();
 
-
-
-
         //not a server and not a client
         if(!((DeviceListFragment) MainActivity.getFragment2()).getIsServer() && !((DeviceListFragment) MainActivity.getFragment2()).getIsClient()) {
 
@@ -230,7 +227,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     }
 
     //play song as a client
-    public void clientPlaySong(String url){
+    public void clientPlaySong(String url, int posn){
 
             Log.i("ClientPlaySong", "Playing A New Song");
             newSong = false;
@@ -246,6 +243,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
             try {
                 player.prepare();
+                player.seekTo(posn);
             } catch (IOException e) {
                 Log.e(MainActivity.TAG, "IOException when client plays song");
             }
