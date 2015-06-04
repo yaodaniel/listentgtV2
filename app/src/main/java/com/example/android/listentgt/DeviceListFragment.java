@@ -321,8 +321,8 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
                     {
                         Log.i("Client handling music", "trying to play");
 
-                        //((DeviceActionListener) getActivity()).clientPlayMusic(
-                              //  cmdString[1]);
+                        MainActivity.musicSrv.clientPlaySong(cmdString[1], 0);
+
                     }
                     catch (NumberFormatException e)
                     {

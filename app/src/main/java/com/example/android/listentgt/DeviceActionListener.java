@@ -15,6 +15,8 @@ public interface DeviceActionListener {
 
     void showDetails(WifiP2pDevice device);
     void connect(WifiP2pConfig config);
+    void disconnect();
+
 
     /**
      * An interface-callback for the activity to listen to fragment interaction
