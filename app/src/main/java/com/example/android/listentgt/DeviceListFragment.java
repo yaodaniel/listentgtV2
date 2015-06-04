@@ -7,6 +7,7 @@ import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -106,11 +107,17 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
         // get the application directory
         wwwroot = mActivity.getApplicationContext().getFilesDir();
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mContentView = inflater.inflate(R.layout.device_list, null);
         this.setListAdapter(new WiFiPeerListAdapter(getActivity(), R.layout.row_devices, peers));
 
+        this.updateThisDevice(device);
         return mContentView;
     }
 
@@ -218,9 +225,9 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
     public void updateThisDevice(WifiP2pDevice device) {
         this.device = device;
         //this is buggish, I dunno why
-        if (MainActivity.getCurrentFragment() == MainActivity.getFragment2()) {
+        if (mContentView != null) {
             TextView view = (TextView) mContentView.findViewById(R.id.my_name);
-            view.setText(device.deviceName);
+            view.setText(Build.MODEL + ": " + device.deviceName);
             view = (TextView) mContentView.findViewById(R.id.my_status);
             view.setText(getDeviceStatus(device.status));
         }
@@ -370,8 +377,21 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
                 // depends on the timing, if we don't get a server back in time,
                 // we may end up running multiple threads of the server
                 // instance!
+
+                Toast.makeText(getActivity(),
+                        "trying to start a DJ Server",
+                        Toast.LENGTH_SHORT).show();
+
+                //destroy the serverThread if it is not null
+                if (this.serverThread != null)
+                    this.serverThread = null;
+
                 if (this.serverThread == null)
                 {
+                    Toast.makeText(getActivity(),
+                            "starting a DJ Server",
+                            Toast.LENGTH_SHORT).show();
+
                     Thread server = new GroupOwnerSocketHandler(this.handler);
                     server.start();
 
@@ -399,6 +419,9 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
                             catch (IOException ioe)
                             {
                                 Log.e("HTTP Server", "Couldn't start server:\n");
+                                Toast.makeText(getActivity(),
+                                        "Server failed.",
+                                        Toast.LENGTH_SHORT).show();
                             }
                         }
                     }
@@ -423,6 +446,9 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
             isServer = false;
             isClient = true;
 
+            if (this.clientThread != null)
+                this.clientThread = null;
+            
             if (this.clientThread == null)
             {
                 Thread client = new ClientSocketHandler(this.handler,
@@ -522,7 +548,7 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
 //
         void connect(WifiP2pConfig config);
 //
-//        void disconnect();
+        void disconnect();
 
 //        void playMusic();
 

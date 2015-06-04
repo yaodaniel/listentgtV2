@@ -173,6 +173,16 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     public static Fragment getCurrentFragment() {return currentFragment;}
 
     @Override
+    public void onDestroy()
+    {
+       //do the cleanup
+        this.disconnect();
+
+        super.onDestroy();
+
+    }
+
+    @Override
     public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
     }
 
@@ -266,6 +276,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         WifiManager wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         wifi.setWifiEnabled(!isWifiP2pEnabled); // true or false to activate/deactivate wifi
         isWifiP2pEnabled = !isWifiP2pEnabled;
+        //update the device info
+        ((DeviceListFragment) getFragment2()).updateThisDevice(((DeviceListFragment) getFragment2()).getDevice());
 
         return true;
     }
@@ -281,6 +293,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
             @Override
             public void onSuccess() {
                 // WiFiDirectBroadcastReceiver will notify us. Ignore for now.
+                Toast.makeText(MainActivity.this, "Invitation sent",
+                        Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -290,6 +304,25 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
             }
         });
     }
+    @Override
+    public void disconnect() {
+
+        manager.removeGroup(channel, new WifiP2pManager.ActionListener() {
+
+            @Override
+            public void onFailure(int reasonCode) {
+                Log.d(TAG, "Disconnect failed. Reason :" + reasonCode);
+            }
+
+            @Override
+            public void onSuccess() {
+                Toast.makeText(MainActivity.this, "Disconnection succeeds",
+                        Toast.LENGTH_SHORT).show();
+            }
+
+        });
+    }
+
 
     @Override
     public void clientPlayMusic(String url)
