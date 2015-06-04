@@ -84,6 +84,7 @@ public class FragmentPlayList extends Fragment implements View.OnClickListener{
     @Override
     public void onDestroy(){
         this.getActivity().stopService(playIntent);
+        this.getActivity().unbindService(musicConnection);
         MainActivity.musicSrv=null;
         super.onDestroy();
     }
