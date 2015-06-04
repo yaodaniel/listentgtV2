@@ -17,10 +17,12 @@ import android.os.Binder;
 import android.os.PowerManager;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.widget.MediaController;
+
 /**
  * Created by DanielY on 5/24/2015.
  */
-public class MusicService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, MediaPlayer.OnCompletionListener{
+public class MusicService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnBufferingUpdateListener{
 
     //media player
     public MediaPlayer player;
@@ -55,6 +57,11 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     public void setList(ArrayList<song> theSongs) {
         songs=theSongs;
+    }
+
+    @Override
+    public void onBufferingUpdate(MediaPlayer mp, int percent) {
+        Log.i("onBufferingUpdate", ""+percent);
     }
 
     public class MusicBinder extends Binder {
