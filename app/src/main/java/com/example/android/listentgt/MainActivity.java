@@ -292,7 +292,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
             @Override
             public void onSuccess() {
-                // WiFiDirectBroadcastReceiver will notify us. Ignore for now.
+                // WiFiDirectBroadcastReceiver will notify us. Ignore for now
+                // make current device the group owner
                 Toast.makeText(MainActivity.this, "Invitation sent",
                         Toast.LENGTH_SHORT).show();
             }
@@ -300,6 +301,27 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
             @Override
             public void onFailure(int reason) {
                 Toast.makeText(MainActivity.this, "Connect failed. Retry.",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+    }
+
+    @Override
+    public void createGroup(View view) {
+        manager.createGroup(channel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+                // WiFiDirectBroadcastReceiver will notify us. Ignore for now
+                // make current device the group owner
+                Toast.makeText(MainActivity.this, "Group created by this device",
+                        Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(int reason) {
+                Toast.makeText(MainActivity.this, "Group creation failure. Retry.",
                         Toast.LENGTH_SHORT).show();
             }
         });

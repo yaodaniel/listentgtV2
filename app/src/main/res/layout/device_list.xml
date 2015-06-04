@@ -51,6 +51,14 @@
         android:onClick="initiateDiscovery"
         style="@android:style/Widget.Holo.ImageButton" />
 
+    <Button
+        android:id="@+id/atn_create_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/create_group_button"
+        android:onClick="createGroup"
+        style="@android:style/Widget.Holo.ImageButton" />
+
     <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="fill_parent"
